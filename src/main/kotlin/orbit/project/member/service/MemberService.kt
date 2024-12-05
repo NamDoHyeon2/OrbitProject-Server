@@ -22,8 +22,6 @@ class MemberService(
 
     // 회원 저장 서비스 메서드
     fun saveMember(memberRequest: MemberRequest): Mono<MemberResponse> {
-        //TODO 구글,카카오,네이버 토큰 값 받아서 정보 가져오기!
-        //잘못된거 있으면 피드백 해줘~~
 
         // 이메일 유효성 검사
         if (!isValidEmail(memberRequest.memberEmail)) {
