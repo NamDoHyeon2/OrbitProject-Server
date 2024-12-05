@@ -14,11 +14,6 @@ class MemberService(
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder // PasswordEncoder 주입
 ) {
-    //TODO 백엔드 저장 필독사항
-    //save(): create와 update를 모두 포함
-    //find(): read (단일 조회 또는 목록 조회)
-    //update(): 엔티티 수정
-    //delete(): 엔티티 삭제
 
     // 회원 저장 서비스 메서드
     fun saveMember(memberRequest: MemberRequest): Mono<MemberResponse> {
@@ -69,7 +64,6 @@ class MemberService(
             }
     }
 
-    // 비밀번호 암호화 함수
     private fun encryptPassword(password: String): String {
         return passwordEncoder.encode(password)
     }
@@ -80,9 +74,6 @@ class MemberService(
         val saveMember = MemberEntity.fromRequest(
             memberRequest.copy(memberPassword = encryptedPassword)
         )
-
-        println(saveMember)
-
         return memberRepository.save(saveMember)
     }
 

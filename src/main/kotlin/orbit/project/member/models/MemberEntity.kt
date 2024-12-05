@@ -18,7 +18,7 @@ data class MemberEntity (
     val loginId: String,
     val password: String,
     val authType: String,
-    val lastLogin: LocalDateTime? = null,
+    var lastLogin: LocalDateTime? = null,
 
 ) : TimestampDto(
     LocalDateTime.now(ZoneId.of("UTC")),
