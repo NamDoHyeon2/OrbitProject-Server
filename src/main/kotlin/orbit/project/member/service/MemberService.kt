@@ -1,0 +1,91 @@
+package orbit.project.member.service
+
+import orbit.project.member.http.MemberRequest
+import orbit.project.member.http.MemberResponse
+import orbit.project.member.models.MemberEntity
+import orbit.project.member.repository.MemberRepository
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
+import reactor.core.publisher.Mono
+
+
+@Service
+class MemberService(
+    private val memberRepository: MemberRepository,
+    private val passwordEncoder: PasswordEncoder // PasswordEncoder 주입
+) {
+    //TODO 백엔드 저장 필독사항
+    //save(): create와 update를 모두 포함
+    //find(): read (단일 조회 또는 목록 조회)
+    //update(): 엔티티 수정
+    //delete(): 엔티티 삭제
+
+    // 회원 저장 서비스 메서드
+    fun saveMember(memberRequest: MemberRequest): Mono<MemberResponse> {
+        //TODO 구글,카카오,네이버 토큰 값 받아서 정보 가져오기!
+        //잘못된거 있으면 피드백 해줘~~
+
+        // 이메일 유효성 검사
+        if (!isValidEmail(memberRequest.memberEmail)) {
+            return Mono.error(IllegalArgumentException("유효하지 않은 이메일 형식입니다."))
+        }
+
+        // 비밀번호 유효성 검사
+        if (!isValidPassword(memberRequest.memberPassword)) {
+            return Mono.error(IllegalArgumentException("비밀번호는 8~20자이며, 숫자, 문자, 특수문자를 포함해야 합니다."))
+        }
+
+        // 아이디 검증, 비밀번호 암호화, 저장을 순차적으로 실행
+        return validateLoginId(memberRequest.memberLoginId)
+            .flatMap {
+                saveToDatabase(memberRequest)
+            }
+            .flatMap { resultMemberEntity ->
+                MemberResponse.fromEntity(Mono.just(resultMemberEntity))
+            }
+    }
+
+    // 이메일 유효성 검사 함수
+    fun isValidEmail(email: String): Boolean {
+        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
+        return email.matches(Regex(emailRegex))
+    }
+
+    // 비밀번호 유효성 검사 함수
+    fun isValidPassword(password: String): Boolean {
+        println(password)
+        val regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*(),.?\":{}|<>]).{8,20}$"
+        return password.matches(Regex(regex))
+    }
+
+
+    // 아이디 중복 검증 함수
+    private fun validateLoginId(loginId: String): Mono<Boolean> {
+        return memberRepository.existsByLoginId(loginId)
+            .flatMap { exists ->
+                if (exists) {
+                    Mono.error(IllegalArgumentException("이미 사용 중인 아이디입니다: $loginId"))
+                } else {
+                    Mono.just(true)
+                }
+            }
+    }
+
+    // 비밀번호 암호화 함수
+    private fun encryptPassword(password: String): String {
+        return passwordEncoder.encode(password)
+    }
+
+    // 회원 저장 함수
+    private fun saveToDatabase(memberRequest: MemberRequest): Mono<MemberEntity> {
+        val encryptedPassword = encryptPassword(memberRequest.memberPassword)
+        val saveMember = MemberEntity.fromRequest(
+            memberRequest.copy(memberPassword = encryptedPassword)
+        )
+
+        println(saveMember)
+
+        return memberRepository.save(saveMember)
+    }
+
+}
