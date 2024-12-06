@@ -1,10 +1,13 @@
 package orbit.project.config
 
+import orbit.project.auth.jwt.JwtTokenValidator
 import orbit.project.config.securityException.CustomServerAccessDeniedHandler
 import orbit.project.config.securityException.CustomServerAuthenticationEntryPoint
+import orbit.project.config.securityJwtFilter.JwtTokenAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -15,7 +18,9 @@ import org.springframework.security.web.server.header.XFrameOptionsServerHttpHea
 
 @Configuration
 @EnableWebFluxSecurity // WebFlux 보안 활성화
-class SpringSecurityConfig {
+class SpringSecurityConfig(
+    private val jwtTokenValidator : JwtTokenValidator,
+) {
 
     @Bean
     fun getPasswordEncoder(): PasswordEncoder {
@@ -56,9 +61,12 @@ class SpringSecurityConfig {
                 frameOptions.mode(XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN)
             }
         }
-        //로그인 진행을 위한 로그인 필터 추가 예정
 
-//        http.addFilterBefore(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
+        //인가 검증을 위한 토큰 필터
+        http.addFilterBefore(
+            JwtTokenAuthenticationFilter(jwtTokenValidator),
+            SecurityWebFiltersOrder.AUTHENTICATION
+        )
 
         return http.build()
     }

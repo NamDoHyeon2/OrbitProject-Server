@@ -4,6 +4,8 @@ import orbit.project.member.http.MemberRequest
 import orbit.project.member.http.MemberResponse
 import orbit.project.member.models.MemberEntity
 import orbit.project.member.repository.MemberRepository
+import orbit.project.utils.exception.CustomException
+import orbit.project.utils.exception.ErrorException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -12,7 +14,7 @@ import reactor.core.publisher.Mono
 @Service
 class MemberService(
     private val memberRepository: MemberRepository,
-    private val passwordEncoder: PasswordEncoder // PasswordEncoder 주입
+    private val passwordEncoder: PasswordEncoder,  // PasswordEncoder 타입으로 주입받기
 ) {
 
     // 회원 저장 서비스 메서드
@@ -76,5 +78,18 @@ class MemberService(
         )
         return memberRepository.save(saveMember)
     }
+
+    //회원 정보 가지고오기
+    fun getMemberById(id: Long): Mono<MemberEntity> {
+        return memberRepository.findByMemberId(id)
+            .flatMap { member -> Mono.just(member) }
+    }
+
+    fun getMemberByLoginId(loginId: String): MemberEntity {
+        return memberRepository.findByLoginId(loginId)
+            ?.switchIfEmpty(Mono.error(CustomException(ErrorException.MEMBER_NOT_FOUND))) //빈 값일 걍우 Mono 객체는 반환하지만~
+            ?.block() ?: throw CustomException(ErrorException.MEMBER_NOT_FOUND) //ㄱ
+    }
+
 
 }

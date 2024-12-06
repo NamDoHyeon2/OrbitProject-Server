@@ -7,7 +7,6 @@ import orbit.project.auth.http.LoginTokenResponse
 import orbit.project.member.models.MemberEntity
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.security.Key
 import java.time.LocalDateTime
 import java.util.*
 import javax.crypto.SecretKey
@@ -55,6 +54,7 @@ class JwtTokenProvider {
         claims["loginId"] = member.loginId
         claims["memberId"] = member.memberId!!
         //TODO Group 정보 추가
+
         return claims
     }
     //암호화 관리 부분
@@ -67,4 +67,5 @@ class JwtTokenProvider {
     private fun calculateTokenExpirationTime(): LocalDateTime {
         return LocalDateTime.now().plusDays(expirationDays)  // 기본값은 3일
     }
+
 }

@@ -21,13 +21,11 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleGeneralException(exception: Exception): ResponseEntity<Map<String, String>> {
-        val errorResponse = mapOf(
-            "errorCode" to "INTERNAL_SERVER_ERROR",
-            "errorMessage" to exception.localizedMessage
+    fun handleGenericException(ex: Exception): ResponseEntity<Map<String, String>> {
+        val response = mapOf(
+            "error" to "INTERNAL_SERVER_ERROR",
+            "message" to "서버 오류가 발생했습니다. 다시 시도해주세요."
         )
-        return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(errorResponse)
+        return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
     }
 }

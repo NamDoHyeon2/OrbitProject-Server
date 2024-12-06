@@ -2,6 +2,8 @@ package orbit.project.config.securityException
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import orbit.project.utils.exception.CustomException
+import orbit.project.utils.exception.ErrorException
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler
@@ -17,12 +19,8 @@ class CustomServerAccessDeniedHandler : ServerAccessDeniedHandler {
         exchange.response.statusCode = HttpStatus.FORBIDDEN
 
         // JSON 형식으로 오류 객체 생성
-        val errorResponse = mapOf(
-            "error" to "Forbidden",
-            "message" to "You do not have permission to access this resource"
-        )
+        val errorResponse = CustomException(ErrorException.FORBIDDEN)
 
-        // 오류 객체를 JSON 형식으로 직렬화
         val jsonResponse = objectMapper.writeValueAsBytes(errorResponse)
 
         // 응답 본문에 JSON 형식의 오류 메시지를 추가

@@ -25,8 +25,7 @@ class AuthService(
         val password = loginRequest.password
 
         return memberRepository.findByLoginId(loginId)
-            ?.switchIfEmpty(Mono.error(CustomException(ErrorException.USER_NOT_FOUND))) // 값이 없으면 User Not Found 에러 발생
-            ?.flatMap { findLoginIdInfo ->
+            .flatMap { findLoginIdInfo ->
                 // 비밀번호 일치 여부 확인
                 if (passwordEncoder.matches(password, findLoginIdInfo.password)) {
                     val token = jwtTokenProvider.generateToken(findLoginIdInfo)
@@ -36,6 +35,6 @@ class AuthService(
                     Mono.error(CustomException(ErrorException.INVALID_PASSWORD)) // 비밀번호 일치하지 않으면 에러 발생
                 }
 
-            } ?: Mono.error(CustomException(ErrorException.INVALID_PASSWORD)) // 패스워드 일치 하지 않으면 에러 발생
+            }
     }
 }
