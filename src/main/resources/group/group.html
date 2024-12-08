@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>그룹 관리 - 실시간 동기화</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<div class="container mx-auto p-6">
+
+    <!-- 헤더 -->
+    <div class="flex justify-between items-center mb-6">
+        <input type="text" placeholder="그룹 검색" class="border-none bg-gray-100 text-gray-700 rounded-lg px-4 py-2 w-1/3 focus:ring-2 focus:ring-blue-400 shadow-sm transition duration-300 text-sm" />
+        <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 active:scale-95 transition-all duration-200 text-sm" id="addGroupBtn">
+            + 그룹 추가
+        </button>
+    </div>
+
+    <!-- 테이블 -->
+    <table class="table-auto w-full text-left text-gray-700" id="group-table">
+        <thead>
+        <tr class="bg-blue-50">
+            <th class="px-6 py-3 text-xs font-semibold">Group Name</th>
+            <th class="px-6 py-3 text-xs font-semibold">Read 권한</th>
+            <th class="px-6 py-3 text-xs font-semibold">Write 권한</th>
+            <th class="px-6 py-3 text-xs font-semibold">수정</th>
+            <th class="px-6 py-3 text-xs font-semibold">삭제</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 테이블 내용이 여기서 동적으로 업데이트됨 -->
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    const BASEURL = "http://localhost:8080"
+    // SSE를 사용하여 실시간 데이터를 서버로부터 받기
+    const eventSource = new EventSource(`${BASEURL}/api/sse/groups`);  // Spring WebFlux SSE 엔드포인트
+
+    eventSource.onmessage = function(event) {
+        try {
+            const groupData = JSON.parse(event.data);  // 서버에서 보낸 JSON 데이터를 파싱
+
+            // 테이블에 새 그룹 추가
+            const tableBody = document.querySelector("#group-table tbody");
+
+            // 새로 들어온 데이터만 추가 (기존 데이터를 초기화하지 않음)
+            const row = document.createElement('tr');
+            row.classList.add('group', 'hover:bg-gray-100', 'transition-all', 'duration-150');
+
+            row.innerHTML = `
+            <td class="px-6 py-4 text-sm">${groupData.groupName}</td>
+            <td class="px-6 py-4 text-center">
+                <div class="flex justify-center items-center space-x-3">
+                    <label class="inline-flex items-center text-sm">
+                        <input type="radio" name="read_permission_${groupData.groupId}" class="form-radio text-blue-500" ${groupData.readPermission ? 'checked' : ''} />
+                        <span class="ml-2">허용</span>
+                    </label>
+                    <label class="inline-flex items-center text-sm">
+                        <input type="radio" name="read_permission_${groupData.groupId}" class="form-radio text-gray-500" ${!groupData.readPermission ? 'checked' : ''} />
+                        <span class="ml-2">거부</span>
+                    </label>
+                </div>
+            </td>
+            <td class="px-6 py-4 text-center">
+                <div class="relative inline-block w-10 h-5">
+                    <input type="checkbox" class="peer hidden" ${groupData.isWrite ? 'checked' : ''} />
+                    <span class="absolute inset-0 bg-gray-300 rounded-full transition-all duration-300 peer-checked:bg-blue-500"></span>
+                    <span class="absolute top-0.5 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 peer-checked:translate-x-5"></span>
+                </div>
+            </td>
+            <td class="px-6 py-4 text-center">
+                <button class="text-blue-500 hover:text-blue-700 transition-colors duration-200" data-id="${groupData.groupId}" class="editBtn">
+                    ✏️ 수정
+                </button>
+            </td>
+            <td class="px-6 py-4 text-center">
+                <button class="text-red-500 hover:text-red-700 active:scale-95 transition-transform duration-200" data-id="${groupData.groupId}" class="deleteBtn">
+                    🗑️ 삭제
+                </button>
+            </td>
+        `;
+            tableBody.appendChild(row);
+
+        } catch (e) {
+            console.error("데이터 처리 중 오류 발생:", e);
+        }
+    };
+
+
+    //     // 수정 버튼 클릭 시 처리
+    //     document.querySelectorAll('.editBtn').forEach(button => {
+    //         button.addEventListener('click', function() {
+    //             const groupId = this.dataset.id;
+    //             editGroup(groupId);
+    //         });
+    //     });
+    //
+    //     // 삭제 버튼 클릭 시 처리
+    //     document.querySelectorAll('.deleteBtn').forEach(button => {
+    //         button.addEventListener('click', function() {
+    //             const groupId = this.dataset.id;
+    //             deleteGroup(groupId);
+    //         });
+    //     });
+    // };
+
+    // 그룹 수정 요청
+    // function editGroup(groupId) {
+    //     const groupName = prompt("그룹 이름을 입력하세요:");
+    //
+    //     if (groupName) {
+    //         // 서버로 그룹 수정 전송
+    //         fetch(`${BASEURL}/api/sse/groups/${groupId}`, {
+    //             method: 'PUT',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify({ name: groupName })
+    //         })
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 console.log("수정 성공:", data);
+    //             })
+    //             .catch(error => {
+    //                 console.error("수정 실패:", error);
+    //             });
+    //     }
+    // }
+
+    // // 그룹 삭제 요청
+    // function deleteGroup(groupId) {
+    //     if (confirm("정말로 이 그룹을 삭제하시겠습니까?")) {
+    //         fetch(`${BASEURL}/api/sse/groups/${groupId}`, {
+    //             method: 'DELETE'
+    //         })
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 console.log("삭제 성공:", data);
+    //             })
+    //             .catch(error => {
+    //                 console.error("삭제 실패:", error);
+    //             });
+    //     }
+    // }
+    //
+    // // SSE 연결 종료 시 처리
+    // eventSource.onerror = function(error) {
+    //     console.error("SSE 연결 오류:", error);
+    //
+    //     eventSource.close();  // 오류 발생 시 연결 종료
+    // };
+    //
+    // // 그룹 추가 버튼 이벤트 (추가적으로 그룹 추가 기능)
+    // document.getElementById("addGroupBtn").addEventListener("click", function() {
+    //     const groupName = prompt("새 그룹 이름을 입력하세요:");
+    //     if (groupName) {
+    //         fetch(`${BASEURL}/api/sse/groups`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify(
+    //                 {
+    //                     groupId : null,
+    //                     groupName: groupName,
+    //                     isRead : true,
+    //                     isWrite : true
+    //                 }
+    //             )
+    //         })
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 console.log("그룹 추가 성공:", data);
+    //             })
+    //             .catch(error => {
+    //                 console.error("그룹 추가 실패:", error);
+    //             });
+    //     }
+    // });
+
+</script>
+
+</body>
+</html>
