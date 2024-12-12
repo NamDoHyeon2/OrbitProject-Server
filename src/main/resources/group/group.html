@@ -153,40 +153,40 @@
     //     }
     // }
     //
-    // // SSE 연결 종료 시 처리
+    // SSE 연결 종료 시 처리
     // eventSource.onerror = function(error) {
     //     console.error("SSE 연결 오류:", error);
     //
     //     eventSource.close();  // 오류 발생 시 연결 종료
     // };
-    //
-    // // 그룹 추가 버튼 이벤트 (추가적으로 그룹 추가 기능)
-    // document.getElementById("addGroupBtn").addEventListener("click", function() {
-    //     const groupName = prompt("새 그룹 이름을 입력하세요:");
-    //     if (groupName) {
-    //         fetch(`${BASEURL}/api/sse/groups`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             },
-    //             body: JSON.stringify(
-    //                 {
-    //                     groupId : null,
-    //                     groupName: groupName,
-    //                     isRead : true,
-    //                     isWrite : true
-    //                 }
-    //             )
-    //         })
-    //             .then(response => response.json())
-    //             .then(data => {
-    //                 console.log("그룹 추가 성공:", data);
-    //             })
-    //             .catch(error => {
-    //                 console.error("그룹 추가 실패:", error);
-    //             });
-    //     }
-    // });
+
+    // 그룹 추가 버튼 이벤트 (추가적으로 그룹 추가 기능)
+    document.getElementById("addGroupBtn").addEventListener("click", function() {
+        const groupName = prompt("새 그룹 이름을 입력하세요:");
+        if (groupName) {
+            fetch(`${BASEURL}/api/sse/groups`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        groupId : null,
+                        groupName: groupName,
+                        isRead : true,
+                        isWrite : true
+                    }
+                )
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("그룹 추가 성공:", data);
+                })
+                .catch(error => {
+                    console.error("그룹 추가 실패:", error);
+                });
+        }
+    });
 
 </script>
 

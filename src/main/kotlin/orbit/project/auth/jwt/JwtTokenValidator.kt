@@ -34,7 +34,6 @@ class JwtTokenValidator(
     @Throws(CustomException::class)
     fun validateJwtToken(jwtToken: String?): Boolean {
         try {
-            println(jwtToken)
             val claimsJws: Jws<Claims> = Jwts.parser().setSigningKey(getSigningKey()).build()
                 .parseClaimsJws(jwtToken)
 
