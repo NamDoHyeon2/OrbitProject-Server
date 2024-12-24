@@ -49,7 +49,7 @@ class SpringSecurityConfig(
                 .pathMatchers(
                     "/api/auth/login",
                     "/api/members/register",
-                    "/api/sse/groups").permitAll() // 인증이 필요 없는 경로 설정
+                    "api/images/**").permitAll() // 인증이 필요 없는 경로 설정
                 .anyExchange().authenticated() // 나머지 경로는 인증 필수
         }
 

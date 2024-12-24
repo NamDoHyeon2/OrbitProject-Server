@@ -10,5 +10,6 @@ enum class ErrorException(val message: String, val statusCode: Int) {
     TOKEN_EXPIRED("토큰이 만료되었습니다.", 401), // 토큰 만료
     FORBIDDEN("접근이 금지되었습니다.", 403),// 접근이 금지됨
     LOGIN_ID_NOT_FOUND("로그인 아이디가 토큰에 존재하지 않습니다.", 400), // 로그인 아이디가 없는 경우
-    MEMBER_ID_NOT_FOUND("멤버 아이디가 토큰에 존재하지 않습니다.", 400) // 멤버 아이디가 없는 경우
+    MEMBER_ID_NOT_FOUND("멤버 아이디가 토큰에 존재하지 않습니다.", 400), // 멤버 아이디가 없는 경우
+    FILE_IMAGE_NOT_FOUND("해당 파일이 존재하지 않습니다.", 400) // 멤버 아이디가 없는 경우
 }

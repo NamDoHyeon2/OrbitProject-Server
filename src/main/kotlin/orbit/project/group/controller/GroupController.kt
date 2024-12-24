@@ -14,10 +14,11 @@ import reactor.core.publisher.Sinks
 @RequestMapping("/api/sse/groups")
 @CrossOrigin(origins = ["http://localhost:63342"])
 class GroupController(
-    private val groupService: GroupService
+    private val groupService: GroupService,
+    private val sink: Sinks.Many<GroupRequest>,
+    private val groupFlux: Flux<GroupRequest>,
 ) {
-    private val sink: Sinks.Many<GroupRequest> = Sinks.many().replay().latest()
-    private val groupFlux: Flux<GroupRequest> = sink.asFlux()
+
 
     @GetMapping("/init")
     fun initData() { groupService.initializeData() }
@@ -27,13 +28,12 @@ class GroupController(
         val exampleGroupList = groupService.createInitialGroups();//기존에 가지고있던 사용자의 그룹
 
         return Flux.merge(groupFlux, Flux.fromIterable(exampleGroupList)) //실시간으로 들어오는 그룹
-            .distinctUntilChanged()  // 중복된 데이터는 필터링 (변경되지 않은 데이터는 발행하지 않음)
+            .distinct { it.groupId } //제거 됨 근데 문제가 있음 groupFlux 에 있는 값이 지워져야하는데;; 뭔가 createInitialGroups에서 가지고온 그룹을 지운느끼;ㅁ
             .map { group ->
                 ServerSentEvent.builder(group)
                     .build()
             }
             .doOnCancel {
-
             }
     }
 
@@ -43,6 +43,7 @@ class GroupController(
         SuccessResponse<List<String>>
         out Any 로 쓰면 다음과같이 처리됨
     ***/
+
     @PostMapping
     fun addGroup(@RequestBody groupRequest: GroupRequest): Mono<SuccessResponse<out Any>> {
         groupService.saveGroup(groupRequest)

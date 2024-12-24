@@ -103,16 +103,7 @@ CREATE TABLE `orbit`.`Member` (
 --   `created_by` INT NOT NULL,
 --   PRIMARY KEY (`value_id`));
 --
--- CREATE TABLE `orbit`.`Image` (
---   `image_id` INT NOT NULL AUTO_INCREMENT,
---   `image_name` VARCHAR(100) NOT NULL,
---   `image_path` VARCHAR(300) NOT NULL,
---   `linked_resource` VARCHAR(255) DEFAULT NULL,
---   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
---   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
---   `created_by` INT NOT NULL,
---   PRIMARY KEY (`image_id`));
---
+
 -- CREATE TABLE `orbit`.`File` (
 --   `file_id` INT NOT NULL AUTO_INCREMENT,
 --   `file_name` VARCHAR(100) NOT NULL,
