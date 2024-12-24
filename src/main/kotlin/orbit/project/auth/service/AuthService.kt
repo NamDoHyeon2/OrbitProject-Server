@@ -20,21 +20,22 @@ class AuthService(
 
     //로그인 검증
     fun authLogin(loginRequest: LoginRequest): Mono<LoginTokenResponse> {
-        println(loginRequest)
-        val loginId = loginRequest.loginId
+        println(loginRequest.email)
+        println(loginRequest.password)
+        val email = loginRequest.email
         val password = loginRequest.password
 
-        return memberRepository.findByLoginId(loginId)
+        return memberRepository.findByEmail(email)
+            .switchIfEmpty(Mono.error(CustomException(ErrorException.MEMBER_NOT_FOUND)))
             .flatMap { findLoginIdInfo ->
                 // 비밀번호 일치 여부 확인
                 if (passwordEncoder.matches(password, findLoginIdInfo.password)) {
                     val token = jwtTokenProvider.generateToken(findLoginIdInfo)
-                    UserActivityService.updateLastLogin(findLoginIdInfo.memberId!! , memberRepository)
+                    UserActivityService.updateLastLogin(findLoginIdInfo.memberId!!, memberRepository)
                     Mono.just(token)
                 } else {
                     Mono.error(CustomException(ErrorException.INVALID_PASSWORD)) // 비밀번호 일치하지 않으면 에러 발생
                 }
-
             }
     }
 }

@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/api/auth")
 class MemberController(
     private val memberService : MemberService
 ) {
 
     // 회원가입
-    @PostMapping("/register")
+    @PostMapping("/signup")
     fun authRegister(@RequestBody memberRequest: MemberRequest): Mono<MemberResponse> =
         memberService.saveMember(memberRequest)
 

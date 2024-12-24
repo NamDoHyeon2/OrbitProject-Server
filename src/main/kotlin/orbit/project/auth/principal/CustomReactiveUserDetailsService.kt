@@ -18,7 +18,7 @@ class CustomReactiveUserDetailsService(
 
 ) : ReactiveUserDetailsService {
     override fun findByUsername(username: String): Mono<UserDetails> {
-        return memberRepository.findByLoginId(username) // Mono<MemberEntity>? 반환
+        return memberRepository.findByEmail(username) // Mono<MemberEntity>? 반환
             .switchIfEmpty(Mono.error(CustomException(ErrorException.MEMBER_NOT_FOUND))) // Mono가 비어 있으면 예외 처리
             .map { memberEntity ->
                 // 인증 권한 관련

@@ -86,7 +86,7 @@ class MemberService(
     }
 
     fun getMemberByLoginId(loginId: String): MemberEntity {
-        return memberRepository.findByLoginId(loginId)
+        return memberRepository.findByEmail(loginId)
             ?.switchIfEmpty(Mono.error(CustomException(ErrorException.MEMBER_NOT_FOUND))) //빈 값일 걍우 Mono 객체는 반환하지만~
             ?.block() ?: throw CustomException(ErrorException.MEMBER_NOT_FOUND) //ㄱ
     }
