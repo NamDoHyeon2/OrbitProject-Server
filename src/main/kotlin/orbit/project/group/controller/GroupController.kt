@@ -12,7 +12,6 @@ import reactor.core.publisher.Sinks
 
 @RestController
 @RequestMapping("/api/sse/groups")
-@CrossOrigin(origins = ["http://localhost:63342"])
 class GroupController(
     private val groupService: GroupService,
     private val sink: Sinks.Many<GroupRequest>,

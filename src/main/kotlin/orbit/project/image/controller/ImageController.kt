@@ -5,6 +5,7 @@ import orbit.project.image.http.ImageResponse
 import orbit.project.image.service.ImageService
 import orbit.project.utils.exception.CustomException
 import orbit.project.utils.exception.ErrorException
+import orbit.project.utils.success.SuccessResponse
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -29,9 +30,14 @@ class ImageController(
 
     // C: 이미지 생성
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun uploadImage(@RequestPart("file") file: Mono<FilePart>): Mono<ImageResponse> {
+    fun uploadImage(@RequestPart("file") file: Mono<FilePart>): Mono<SuccessResponse<ImageResponse>> {
         return imageService.saveImage(file)
+            .map {
+                imageResponse -> SuccessResponse(code = 200, message = true, data = imageResponse)
+            }
     }
+
+
 
     @GetMapping("/{imageUniqueId}", produces = [MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE])  // 지원되는 이미지 MIME 타입
     fun getImage(@PathVariable imageUniqueId: String): Mono<ResponseEntity<*>> {

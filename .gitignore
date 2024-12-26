@@ -32,6 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
+### bash ###
+conn.bash
+deployBuild.bash
+
 ### propertis ##
 src/main/resources/application.properties
 src/main/resources/images/**

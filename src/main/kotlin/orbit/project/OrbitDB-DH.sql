@@ -46,4 +46,32 @@ create table `orbit_db`.`image` (
                                     `created_by` varchar(100) not null,
                                     primary key (`image_id`)
 );
+CREATE TABLE `orbit_db`.`project` (
+                                   `project_id` INT NOT NULL AUTO_INCREMENT,
+                                   `project_name` VARCHAR(30) NOT NULL,
+                                   `project_description` VARCHAR(100) NOT NULL, #프로젝트 설명
+                                   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                   `created_by` varchar(100) NOT NULL,
+                                   PRIMARY KEY (`project_id`)
+);
+
+CREATE TABLE `orbit_db`.`project_member` (
+                                          `project_id` INT NOT NULL,
+                                          `member_id` INT NOT NULL,
+                                          `joined_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 멤버가 프로젝트에 참여한 날짜
+                                          PRIMARY KEY (`project_id`, `member_id`), -- 복합 키로 유일성 보장
+                                          CONSTRAINT `fk_project` FOREIGN KEY (`project_id`) REFERENCES `project`(`project_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                                          CONSTRAINT `fk_member` FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+#멤버가 특정 프로젝트에 속해 있는지 확인
+#→ SELECT * FROM project_member WHERE project_id = ? AND member_id = ?;
+
+#특정 프로젝트에 속한 모든 멤버 조회
+#→ SELECT m.* FROM member m INNER JOIN project_member pm ON m.member_id = pm.member_id WHERE pm.project_id = ?;
+
+#특정 멤버가 참여 중인 모든 프로젝트 조회
+#→ SELECT p.* FROM project p INNER JOIN project_member pm ON p.project_id = pm.project_id WHERE pm.member_id = ?;
 
