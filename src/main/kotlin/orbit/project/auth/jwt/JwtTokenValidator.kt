@@ -67,7 +67,7 @@ class JwtTokenValidator(
 
     fun getAuthenticationByClaims(claims: Claims): Mono<Authentication> {
         // Claims에서 loginId와 memberId를 추출하고, 없으면 예외 발생
-        val loginId = claims["loginId"] ?: throw CustomException(ErrorException.LOGIN_ID_NOT_FOUND)
+        val loginId = claims["loginId"] ?: throw CustomException(ErrorException.EMAIL_NOT_FOUND)
         val memberId = claims["memberId"] ?: throw CustomException(ErrorException.MEMBER_ID_NOT_FOUND)
 
         return customReactiveUserDetailsService.findByUsername(loginId as String)

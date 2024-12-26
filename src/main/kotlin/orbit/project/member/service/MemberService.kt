@@ -6,6 +6,8 @@ import orbit.project.member.models.MemberEntity
 import orbit.project.member.repository.MemberRepository
 import orbit.project.utils.exception.CustomException
 import orbit.project.utils.exception.ErrorException
+import orbit.project.utils.fail.FailResponse
+import orbit.project.utils.success.SuccessResponse
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -18,27 +20,44 @@ class MemberService(
 ) {
 
     // 회원 저장 서비스 메서드
-    fun saveMember(memberRequest: MemberRequest): Mono<MemberResponse> {
-
+    fun saveMember(memberRequest: MemberRequest): Mono<SuccessResponse<Nothing>> {
         // 이메일 유효성 검사
         if (!isValidEmail(memberRequest.memberEmail)) {
-            return Mono.error(IllegalArgumentException("유효하지 않은 이메일 형식입니다."))
+            throw CustomException(ErrorException.INVALID_EMAIL) // INVALID_EMAIL 예외 발생
         }
 
         // 비밀번호 유효성 검사
         if (!isValidPassword(memberRequest.memberPassword)) {
-            return Mono.error(IllegalArgumentException("비밀번호는 8~20자이며, 숫자, 문자, 특수문자를 포함해야 합니다."))
+            throw CustomException(ErrorException.INVALID_PASSWORD) // INVALID_PASSWORD 예외 발생
         }
 
-        // 아이디 검증, 비밀번호 암호화, 저장을 순차적으로 실행
-        return validateLoginId(memberRequest.memberLoginId)
-            .flatMap {
-                saveToDatabase(memberRequest)
+        // 비밀번호 암호화 및 저장
+        return saveToDatabase(memberRequest)
+            .map {
+                // 성공 응답 생성
+                SuccessResponse(
+                    successCode = 200,
+                    successResult = true,
+                    data = null // 데이터는 필요 없으므로 null로 설정
+                )
             }
-            .flatMap { resultMemberEntity ->
-                MemberResponse.fromEntity(Mono.just(resultMemberEntity))
+            .onErrorResume { e ->
+                val failResponse = when (e) {
+                    is CustomException -> FailResponse(
+                        FailCode = e.statusCode, // CustomException에서 statusCode 추출
+                        FailResult = false,
+                        data = e.message ?: "Unknown error occurred."
+                    )
+                    else -> FailResponse(
+                        FailCode = ErrorException.SERVER_ERROR.statusCode, // 알 수 없는 서버 오류
+                        FailResult = false,
+                        data = ErrorException.SERVER_ERROR.message ?: "Unknown error occurred."
+                    )
+                }
+                Mono.error(e) // 오류 발생 시 실패 응답 반환
             }
     }
+
 
     // 이메일 유효성 검사 함수
     fun isValidEmail(email: String): Boolean {
@@ -53,18 +72,6 @@ class MemberService(
         return password.matches(Regex(regex))
     }
 
-
-    // 아이디 중복 검증 함수
-    private fun validateLoginId(loginId: String): Mono<Boolean> {
-        return memberRepository.existsByLoginId(loginId)
-            .flatMap { exists ->
-                if (exists) {
-                    Mono.error(IllegalArgumentException("이미 사용 중인 아이디입니다: $loginId"))
-                } else {
-                    Mono.just(true)
-                }
-            }
-    }
 
     private fun encryptPassword(password: String): String {
         return passwordEncoder.encode(password)

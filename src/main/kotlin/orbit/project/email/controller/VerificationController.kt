@@ -1,7 +1,6 @@
 package orbit.project.email.controller
 
 import orbit.project.email.http.SendVerificationCodeRequest
-import orbit.project.email.http.VerificationResponse
 import orbit.project.email.http.VerifyCodeRequest
 import orbit.project.email.service.VerificationService
 
@@ -15,12 +14,12 @@ class VerificationController(
 ) {
 
     @PostMapping("/SendCode")
-    fun sendVerificationCode(@RequestBody request: SendVerificationCodeRequest): Mono<VerificationResponse> {
+    fun sendVerificationCode(@RequestBody request: SendVerificationCodeRequest): Mono<Any> {
         return verificationService.sendVerificationEmailCode(request.email)
     }
 
     @PostMapping("/VerifyCode")
-    fun verifyCode(@RequestBody request: VerifyCodeRequest): Mono<VerificationResponse> {
-        return verificationService.verifyCode(request.email, request.code)
+    fun verifyCode(@RequestBody request: VerifyCodeRequest): Mono<Any> {
+        return verificationService.verifyCode(request.email, request.code , request.requestTime)
     }
 }

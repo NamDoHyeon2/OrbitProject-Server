@@ -25,7 +25,7 @@ class JwtTokenProvider {
     fun generateToken(loginUserInfo: MemberEntity): LoginTokenResponse {
         return LoginTokenResponse(
             memberId = loginUserInfo.memberId!!,
-            loginId = loginUserInfo.loginId,
+            loginId = loginUserInfo.email,
             grantType = "Bearer",
             authToken = createJWTToken(loginUserInfo),
             authTokenExpiredAt = calculateTokenExpirationTime()  // 만료 시간 계산
@@ -40,7 +40,7 @@ class JwtTokenProvider {
         return Jwts.builder()
             .claims(claims)  // Claims
             .id(UUID.randomUUID().toString())  // 고유 ID
-            .subject(member.loginId)  // 사용자 로그인 ID
+            .subject(member.email)  // 사용자 이메일
             .issuer("Orbit")  // 발급자
             .issuedAt(now)  // 발급 시간
             .expiration(expirationTime)  // 만료 시간 설정 (3일 후)
@@ -51,7 +51,7 @@ class JwtTokenProvider {
     // 정보 관리 부분
     private fun createClaims(member: MemberEntity): Map<String, Any> {
         val claims = mutableMapOf<String, Any>()
-        claims["loginId"] = member.loginId
+        claims["loginId"] = member.email
         claims["memberId"] = member.memberId!!
         //TODO Group 정보 추가
 

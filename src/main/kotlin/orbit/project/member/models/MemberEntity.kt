@@ -13,11 +13,14 @@ data class MemberEntity (
     val memberId: Long? = null, // PK로 설정, 기본값을 null로 설정
     val groupId: Long? = null,  // 기본값을 null로 설정
     val roleId: Long? = null,   // 기본값을 null로 설정
-    val name: String,
     val email: String,
-    val loginId: String,
     val password: String,
+    val name: String,
+    val birth : String,
+    val phoneNumber : String,
+    val job : String,
     val authType: String,
+    val inviteCode : String,
     var lastLogin: LocalDateTime? = null,
 
 ) : TimestampDto(
@@ -29,11 +32,14 @@ data class MemberEntity (
             memberId = null,          // MemberEntity 생성 시 memberId는 null로 설정
             groupId = 1,           // groupId는 아직 알 수 없으므로 1 -> test_group ( 나중에 디폴트로 변경 )
             roleId = 1,            // roleId도 아직 알 수 없으므로 1 -> test_role (나중에 디폴트로 변경 )
-            name = memberRequest.memberName,
             email = memberRequest.memberEmail,
-            loginId = memberRequest.memberLoginId,
             password = memberRequest.memberPassword,
+            name = memberRequest.memberName,
+            birth = memberRequest.memberBirth,
+            phoneNumber = memberRequest.memberPhoneNumber,
+            job = memberRequest.memberJob,
             authType = memberRequest.memberAuthType,
+            inviteCode = memberRequest.inviteCode,
             lastLogin = LocalDateTime.now()
         )
     }

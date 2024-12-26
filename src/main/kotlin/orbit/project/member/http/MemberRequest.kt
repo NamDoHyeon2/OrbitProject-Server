@@ -2,11 +2,15 @@ package orbit.project.member.http
 
 
 data class MemberRequest (
-    val memberLoginId: String,
+    val memberEmail: String,
     val memberPassword: String,
     val memberName : String,
-    val memberEmail: String,
-    val memberAuthType : String
+    val memberBirth: String,
+    val memberPhoneNumber : String,
+    val memberJob : String,
+    val memberAuthType : String,
+    val inviteCode : String,
+
 ){
 
 }

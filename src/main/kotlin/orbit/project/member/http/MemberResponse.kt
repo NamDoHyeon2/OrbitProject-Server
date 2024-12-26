@@ -5,9 +5,14 @@ import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 
 data class MemberResponse(
-    val loginId: String,
-    val password: String,
     val email: String,
+    val password: String,
+    val name: String,
+    val birth: String,
+    val phoneNumber: String,
+    val job: String,
+    val authType: String,
+    val inviteCode: String,
     val createAt : LocalDateTime,
     val updateDateTime : LocalDateTime
 ) {
@@ -16,9 +21,14 @@ data class MemberResponse(
         fun fromEntity(memberEntityMono: Mono<MemberEntity>): Mono<MemberResponse> =
             memberEntityMono.map { memberEntity ->
                 MemberResponse(
-                    loginId = memberEntity.loginId,
-                    password = memberEntity.password,
                     email = memberEntity.email,
+                    password = memberEntity.password,
+                    name = memberEntity.name,
+                    birth = memberEntity.birth,
+                    phoneNumber = memberEntity.phoneNumber,
+                    job = memberEntity.job,
+                    authType = memberEntity.authType,
+                    inviteCode = memberEntity.inviteCode,
                     createAt = memberEntity.createdAt,
                     updateDateTime = memberEntity.updatedAt
                 )
