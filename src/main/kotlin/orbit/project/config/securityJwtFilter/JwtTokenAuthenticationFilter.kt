@@ -17,7 +17,6 @@ class JwtTokenAuthenticationFilter(
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         val token = resolveToken(exchange.request)
 
-
         return if (!token.isNullOrEmpty() && jwtValidator.validateJwtToken(token)) {
             val authenticationMono = jwtValidator.getAuthentication(token) // Mono<Authentication> 반환
 

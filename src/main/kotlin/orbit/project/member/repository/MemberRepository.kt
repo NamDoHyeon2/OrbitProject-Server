@@ -9,6 +9,8 @@ interface MemberRepository : ReactiveCrudRepository<MemberEntity, Long> {
 
     fun findByEmail(email: String): Mono<MemberEntity>
 
+    // fun existsByLoginId(loginId: String): Mono<Boolean> // 데이터베이스 ID와 입력받은 ID 값 중복 확인
+
     fun findByMemberId(memberId: Long): Mono<MemberEntity>
 
 }

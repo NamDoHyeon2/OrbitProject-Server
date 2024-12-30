@@ -19,6 +19,14 @@ class CustomUserDetails(
         return memberEntity.name
     }
 
+    fun getEmail(): String {
+        return memberEntity.email
+    }
+
+    fun getUserId() : Long {
+        return memberEntity.memberId!!
+    }
+
     override fun isAccountNonExpired(): Boolean {
         // 계정 만료 여부 체크 (여기서는 항상 true로 설정)
         return true
@@ -38,5 +46,4 @@ class CustomUserDetails(
         // 계정 활성화 여부 체크 (여기서는 항상 true로 설정)
         return true
     }
-
 }

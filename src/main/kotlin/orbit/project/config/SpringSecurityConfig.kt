@@ -19,9 +19,9 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 
 @Configuration
-@EnableWebFluxSecurity
+@EnableWebFluxSecurity // WebFlux 보안 활성화
 class SpringSecurityConfig(
-    private val jwtTokenValidator: JwtTokenValidator,
+    private val jwtTokenValidator : JwtTokenValidator,
 ) {
 
     @Bean
@@ -50,18 +50,22 @@ class SpringSecurityConfig(
         http.cors { cors -> cors.configurationSource(corsConfigurationSource()) }
 
         // 기존 코드 유지
+        // 폼 로그인과 기본 HTTP 인증을 비활성화
         http.csrf { auth -> auth.disable() }
         http.formLogin { auth -> auth.disable() }
         http.httpBasic { auth -> auth.disable() }
 
+        // 세션 STATELESS 설정
         http.securityContextRepository(WebSessionServerSecurityContextRepository())
 
+        //인증 실패시 처리
         http.exceptionHandling {
-            it.authenticationEntryPoint(CustomServerAuthenticationEntryPoint())
-            it.accessDeniedHandler(CustomServerAccessDeniedHandler())
+            it.authenticationEntryPoint(CustomServerAuthenticationEntryPoint()) // 인증 실패 시 처리
+            it.accessDeniedHandler(CustomServerAccessDeniedHandler()) // 권한 부족 시 처리
         }
 
-        http.authorizeExchange { auth ->
+        //인증 경로
+        http.authorizeExchange{ auth ->
             auth
                 .pathMatchers(
                     "/api/auth/login",
@@ -69,20 +73,24 @@ class SpringSecurityConfig(
                     "/api/members/register",
                     "/api/sse/groups",
                     "/api/auth/SendCode",
-                    "/api/auth/VerifyCode"
-                ).permitAll()
-                .anyExchange().authenticated()
+                    "/api/auth/VerifyCode",
+                    "api/images/**").permitAll() // 인증이 필요 없는 경로 설정
+                .anyExchange().authenticated() // 나머지 경로는 인증 필수
         }
 
+        //익명 사용자 비 활성화
+        //로그아웃 비 활성화
         http.anonymous { auth -> auth.disable() }
         http.logout { auth -> auth.disable() }
 
+        //Iframe 막기
         http.headers { headers ->
             headers.frameOptions { frameOptions ->
                 frameOptions.mode(XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN)
             }
         }
 
+        //인가 검증을 위한 토큰 필터
         http.addFilterBefore(
             JwtTokenAuthenticationFilter(jwtTokenValidator),
             SecurityWebFiltersOrder.AUTHENTICATION
@@ -90,4 +98,6 @@ class SpringSecurityConfig(
 
         return http.build()
     }
+
+
 }
