@@ -1,7 +1,6 @@
 package orbit.project.auth.service
 
 import orbit.project.auth.http.LoginRequest
-import orbit.project.auth.http.LoginTokenResponse
 import orbit.project.auth.jwt.JwtTokenProvider
 import orbit.project.auth.utils.UserActivityService
 import orbit.project.member.repository.MemberRepository

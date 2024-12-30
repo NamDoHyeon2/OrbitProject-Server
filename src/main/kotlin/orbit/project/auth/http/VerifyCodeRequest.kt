@@ -1,4 +1,4 @@
-package orbit.project.email.http
+package orbit.project.auth.http
 
 import java.time.LocalDateTime
 

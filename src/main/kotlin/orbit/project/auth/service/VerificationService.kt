@@ -1,4 +1,4 @@
-package orbit.project.email.service
+package orbit.project.auth.service
 
 import orbit.project.utils.exception.CustomException
 import orbit.project.utils.exception.ErrorException
@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+
 import reactor.core.publisher.Mono
 import java.util.concurrent.ConcurrentHashMap
 
@@ -101,18 +102,24 @@ class VerificationService(
         return (100000..999999).random().toString()
     }
 
+
     private fun sendEmail(email: String, code: String): Mono<Void> {
         return Mono.fromCallable {
-            val mimeMessage = mailSender.createMimeMessage()
-            val helper = MimeMessageHelper(mimeMessage, "UTF-8")
+            try {
+                val mimeMessage = mailSender.createMimeMessage()
+                val helper = MimeMessageHelper(mimeMessage, "UTF-8")
 
-            helper.setTo(email)
-            helper.setSubject("Orbit 인증번호를 확인해주세요.")
-            helper.setText("인증번호 : $code")
-            helper.setFrom("Orbit <skaehgus113@naver.com>")
+                helper.setTo(email)
+                helper.setSubject("Orbit 인증번호를 확인해주세요.")
+                helper.setText("인증번호 : $code")
+                helper.setFrom("Orbit <skaehgus113@naver.com>")
 
-            mailSender.send(mimeMessage)
-            println("Email successfully sent to $email")
+                mailSender.send(mimeMessage)
+                println("Email successfully sent to $email")
+            } catch (e: Exception) {
+                println("Failed to send email to $email: ${e.message}")
+                throw e
+            }
         }.then()
     }
 }
