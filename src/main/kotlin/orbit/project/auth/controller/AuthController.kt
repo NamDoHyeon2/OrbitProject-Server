@@ -19,6 +19,11 @@ class AuthController(
         return authService.authLogin(loginRequest)
     }
 
+    @PostMapping("/googlelogin")
+    fun googlelogin(@RequestParam token: String): Mono<Any> {
+        return authService.googleLogin(token)
+    }
+
     @PostMapping("/SendCode")
     fun sendVerificationCode(@RequestParam email: String): Mono<Any> {
         return verificationService.sendVerificationEmailCode(email)

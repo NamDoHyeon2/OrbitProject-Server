@@ -19,7 +19,7 @@ class ProjectController(
     @PostMapping
     fun addProject(@RequestBody projectRequest: ProjectRequest) : Mono<SuccessResponse<ProjectResponse>> =
         projectService.saveProject(projectRequest)
-            .map { projectResponse -> SuccessResponse(code = 200, message = true, data = projectResponse) }
+            .map { projectResponse -> SuccessResponse(successCode = 200, successResult = true, data = projectResponse) }
 
 
 }

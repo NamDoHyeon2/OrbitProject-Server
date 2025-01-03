@@ -85,13 +85,13 @@ class VerificationService(
     private fun handleFailure(ex: Throwable): Mono<Any> {
         val failResponse = when (ex) {
             is CustomException -> FailResponse(
-                FailCode = ex.statusCode,
-                FailResult = false,
+                failCode = ex.statusCode,
+                failResult = false,
                 data = ex.message
             )
             else -> FailResponse(
-                FailCode = ErrorException.SERVER_ERROR.statusCode,
-                FailResult = false,
+                failCode = ErrorException.SERVER_ERROR.statusCode,
+                failResult = false,
                 data = ErrorException.SERVER_ERROR.message ?: "Unknown error occurred."
             )
         }

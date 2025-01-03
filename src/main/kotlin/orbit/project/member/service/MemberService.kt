@@ -44,13 +44,13 @@ class MemberService(
             .onErrorResume { e ->
                 val failResponse = when (e) {
                     is CustomException -> FailResponse(
-                        FailCode = e.statusCode, // CustomException에서 statusCode 추출
-                        FailResult = false,
+                        failCode = e.statusCode, // CustomException에서 statusCode 추출
+                        failResult = false,
                         data = e.message ?: "Unknown error occurred."
                     )
                     else -> FailResponse(
-                        FailCode = ErrorException.SERVER_ERROR.statusCode, // 알 수 없는 서버 오류
-                        FailResult = false,
+                        failCode = ErrorException.SERVER_ERROR.statusCode, // 알 수 없는 서버 오류
+                        failResult = false,
                         data = ErrorException.SERVER_ERROR.message ?: "Unknown error occurred."
                     )
                 }

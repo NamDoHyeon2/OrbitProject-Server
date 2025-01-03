@@ -74,6 +74,7 @@ class SpringSecurityConfig(
                     "/api/sse/groups",
                     "/api/auth/SendCode",
                     "/api/auth/VerifyCode",
+                    "/api/auth/googlelogin",
                     "api/images/**").permitAll() // 인증이 필요 없는 경로 설정
                 .anyExchange().authenticated() // 나머지 경로는 인증 필수
         }

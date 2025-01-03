@@ -33,7 +33,7 @@ class ImageController(
     fun uploadImage(@RequestPart("file") file: Mono<FilePart>): Mono<SuccessResponse<ImageResponse>> {
         return imageService.saveImage(file)
             .map {
-                imageResponse -> SuccessResponse(code = 200, message = true, data = imageResponse)
+                imageResponse -> SuccessResponse(successCode = 200, successResult = true, data = imageResponse)
             }
     }
 

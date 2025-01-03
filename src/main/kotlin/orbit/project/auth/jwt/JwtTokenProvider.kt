@@ -25,7 +25,7 @@ class JwtTokenProvider {
     fun generateToken(loginUserInfo: MemberEntity): LoginTokenResponse {
         return LoginTokenResponse(
             memberId = loginUserInfo.memberId!!,
-            loginId = loginUserInfo.email,
+            email = loginUserInfo.email,
             grantType = "Bearer",
             authToken = createJWTToken(loginUserInfo),
             authTokenExpiredAt = calculateTokenExpirationTime()  // 만료 시간 계산

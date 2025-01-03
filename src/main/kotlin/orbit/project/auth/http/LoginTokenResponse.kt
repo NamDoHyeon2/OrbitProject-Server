@@ -7,7 +7,7 @@ data class LoginTokenResponse(
     //로그인 ID
     val memberId : Long,
 
-    val loginId: String,
+    val email: String,
 
     val grantType: String = "Bearer",
 
