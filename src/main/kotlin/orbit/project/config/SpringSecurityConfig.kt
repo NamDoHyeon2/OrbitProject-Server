@@ -33,7 +33,7 @@ class SpringSecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration().apply {
-            addAllowedOrigin("http://34.64.173.72:3000") // 허용할 Origin
+            addAllowedOrigin("http://orbit-app.net:3000") // 허용할 Origin
             addAllowedMethod("*") // 모든 HTTP 메서드 허용
             addAllowedHeader("*") // 모든 헤더 허용
             allowCredentials = false // 쿠키를 사용하지 않을 경우 false

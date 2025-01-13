@@ -3,6 +3,7 @@ package orbit.project.auth.service
 import orbit.project.auth.http.LoginRequest
 import orbit.project.auth.jwt.JwtTokenProvider
 import orbit.project.auth.utils.UserActivityService
+import orbit.project.member.http.MemberRequest
 import orbit.project.member.models.MemberEntity
 import orbit.project.member.repository.MemberRepository
 import orbit.project.utils.exception.CustomException
@@ -60,12 +61,12 @@ class AuthService(
 
     fun googleLogin(token: String): Mono<Any> {
         val webClient = WebClient.builder()
-            .baseUrl("https://www.googleapis.com/oauth2/v3/userinfo")
+            .baseUrl("https://oauth2.googleapis.com/tokeninfo")
             .build()
 
         return webClient.get()
             .uri { uriBuilder ->
-                uriBuilder.queryParam("access_token", token).build()
+                uriBuilder.queryParam("id_token", token).build()
             }
             .retrieve()
             .bodyToMono(Map::class.java)
@@ -74,32 +75,42 @@ class AuthService(
                 val name = userInfo["name"] as? String
 
                 if (email != null && name != null) {
-                    // 데이터베이스에서 사용자 조회
+                    val memberRequest = MemberRequest(
+                        memberEmail = email,
+                        memberPassword = "", // Google 로그인에서는 비밀번호 사용 안함
+                        memberName = name,
+                        memberBirth = "2001-04-12", // 기본값 제공
+                        memberPhoneNumber = "010-5298-4265", // 기본값 제공
+                        memberJob = "BackEnd Developer", // 기본값 제공
+                        memberAuthType = "Google",
+                        inviteCode = "test" // 기본값 제공
+                    )
+
+                    // MemberEntity를 fromRequest를 통해 생성
+                    val memberEntity = MemberEntity.fromRequest(memberRequest)
+
                     memberRepository.findByEmail(email)
                         .switchIfEmpty(
-                            // 존재하지 않을 경우 새 사용자 저장
-                            memberRepository.save(
-                                MemberEntity(
-                                    email = email,
-                                    password = "", // Google 로그인에서는 비밀번호 사용 안함
-                                    name = name,
-                                    birth = "null", // 근데 애네는 어떻게 불러오지..? api 사용해도 불러올 수가 없는데..
-                                    phoneNumber = "null", // 근데 애네는 어떻게 불러오지..? api 사용해도 불러올 수가 없는데..
-                                    job = "null", // 애는 웹에서 직접 대입을 받아야 저장가능
-                                    authType = "Google",
-                                    inviteCode = "null", // 애는 웹에서 직접 대입을 받아야 저장가능
-                                )
-                            )
+                            memberRepository.save(memberEntity)
                         )
-                        .flatMap { memberEntity ->
+                        .flatMap { savedMemberEntity ->
                             // JWT 토큰 생성
-                            val loginTokenResponse = jwtTokenProvider.generateToken(memberEntity)
+                            val loginTokenResponse = jwtTokenProvider.generateToken(savedMemberEntity)
+
+                            // auth_type이 Google인 경우 Google 토큰 반환
+                            val modifiedResponse = if (savedMemberEntity.authType == "Google") {
+                                loginTokenResponse.copy(
+                                    authToken = token // Google의 id_token을 authToken으로 설정
+                                )
+                            } else {
+                                loginTokenResponse
+                            }
 
                             // 성공 응답 반환
                             Mono.just(SuccessResponse(
                                 successCode = 200,
                                 successResult = true,
-                                data = loginTokenResponse
+                                data = modifiedResponse
                             ) as Any)
                         }
                 } else {
@@ -113,7 +124,6 @@ class AuthService(
                         failResult = false,
                         data = e.message ?: "Invalid email or user info."
                     )
-
                     else -> FailResponse(
                         failCode = ErrorException.SERVER_ERROR.statusCode,
                         failResult = false,
@@ -123,5 +133,7 @@ class AuthService(
                 Mono.just(failResponse as Any)
             }
     }
+
+
 }
 

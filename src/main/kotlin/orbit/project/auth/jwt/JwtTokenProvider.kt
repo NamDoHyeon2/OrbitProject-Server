@@ -26,7 +26,7 @@ class JwtTokenProvider {
         return LoginTokenResponse(
             memberId = loginUserInfo.memberId!!,
             email = loginUserInfo.email,
-            grantType = "Bearer",
+            grantType = loginUserInfo.authType,
             authToken = createJWTToken(loginUserInfo),
             authTokenExpiredAt = calculateTokenExpirationTime()  // 만료 시간 계산
         )
