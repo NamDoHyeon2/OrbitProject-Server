@@ -2,6 +2,7 @@ package orbit.project.auth.utils
 
 import CustomUserDetails
 import orbit.project.member.repository.MemberRepository
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
@@ -25,6 +26,15 @@ object UserActivityService {
                 val authentication = securityContext.authentication
                 val customUserDetails = authentication.principal as? CustomUserDetails
                 customUserDetails?.getEmail().toString()  // CustomUserDetails에서 이메일을 가져오기
+            }
+    }
+
+    fun getMemberIdFromSecurityContext(): Mono<Long> {
+        return ReactiveSecurityContextHolder.getContext()
+            .map { securityContext ->
+                val authentication = securityContext.authentication
+                val customUserDetails = authentication.principal as? CustomUserDetails
+                customUserDetails?.getUserId() ?: throw IllegalStateException("No memberId found in SecurityContext")
             }
     }
 

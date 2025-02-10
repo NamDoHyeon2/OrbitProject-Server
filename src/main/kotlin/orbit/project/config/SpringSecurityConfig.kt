@@ -33,10 +33,11 @@ class SpringSecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration().apply {
+            addAllowedOrigin("http://localhost:3000") // 허용할 Origin
             addAllowedOrigin("http://orbit-app.net:3000") // 허용할 Origin
             addAllowedMethod("*") // 모든 HTTP 메서드 허용
             addAllowedHeader("*") // 모든 헤더 허용
-            allowCredentials = false // 쿠키를 사용하지 않을 경우 false
+            allowCredentials = true // 쿠키를 사용하지 않을 경우 false
         }
 
         val source = UrlBasedCorsConfigurationSource()
@@ -56,6 +57,7 @@ class SpringSecurityConfig(
         http.httpBasic { auth -> auth.disable() }
 
         // 세션 STATELESS 설정
+        val securityContextRepository = WebSessionServerSecurityContextRepository()
         http.securityContextRepository(WebSessionServerSecurityContextRepository())
 
         //인증 실패시 처리
@@ -75,6 +77,9 @@ class SpringSecurityConfig(
                     "/api/auth/SendCode",
                     "/api/auth/VerifyCode",
                     "/api/auth/googlelogin",
+                    "/api/auth/kakaologin",
+                    "/api/auth/MainData",
+                    "/api/auth/TodoList",
                     "api/images/**").permitAll() // 인증이 필요 없는 경로 설정
                 .anyExchange().authenticated() // 나머지 경로는 인증 필수
         }
@@ -93,7 +98,7 @@ class SpringSecurityConfig(
 
         //인가 검증을 위한 토큰 필터
         http.addFilterBefore(
-            JwtTokenAuthenticationFilter(jwtTokenValidator),
+            JwtTokenAuthenticationFilter(jwtTokenValidator, securityContextRepository),
             SecurityWebFiltersOrder.AUTHENTICATION
         )
 

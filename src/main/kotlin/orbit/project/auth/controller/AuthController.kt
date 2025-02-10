@@ -24,6 +24,11 @@ class AuthController(
         return authService.googleLogin(token)
     }
 
+    @PostMapping("/kakaologin")
+    fun kakaoLogin(@RequestParam code: String): Mono<Any> {
+        return authService.kakaoLogin(code)
+    }
+
     @PostMapping("/SendCode")
     fun sendVerificationCode(@RequestParam email: String): Mono<Any> {
         return verificationService.sendVerificationEmailCode(email)

@@ -3,6 +3,8 @@ package orbit.project.config.securityJwtFilter
 import orbit.project.auth.jwt.JwtTokenValidator
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
+import org.springframework.security.core.context.SecurityContextImpl
+import org.springframework.security.web.server.context.ServerSecurityContextRepository
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
@@ -11,23 +13,26 @@ import reactor.core.publisher.Mono
 private const val HEADER_PREFIX = "Bearer"
 
 class JwtTokenAuthenticationFilter(
-    private val jwtValidator : JwtTokenValidator
+    private val jwtValidator : JwtTokenValidator,
+    private val securityContextRepository: ServerSecurityContextRepository
 ) : WebFilter  {
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         val token = resolveToken(exchange.request)
 
         return if (!token.isNullOrEmpty() && jwtValidator.validateJwtToken(token)) {
-            val authenticationMono = jwtValidator.getAuthentication(token) // Mono<Authentication> 반환
+            val authenticationMono = jwtValidator.getAuthentication(token)
 
             authenticationMono.flatMap { authentication ->
-                chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
+                val securityContext = SecurityContextImpl(authentication)
+
+                securityContextRepository.save(exchange, securityContext)
+                    .then(chain.filter(exchange)
+                        .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext))))
             }
         } else {
-            chain.filter(exchange) // 인증 정보가 없을 경우 기본 필터 체인 실행
+            chain.filter(exchange)
         }
-
     }
 
     //토큰 얻는 함수

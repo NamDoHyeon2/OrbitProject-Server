@@ -58,8 +58,9 @@ class JwtTokenValidator(
 
 
     fun getAuthentication(token: String): Mono<Authentication> {
-        // 토큰을 검증하여 Claims를 추출
-        val claimsJws: Jws<Claims> = Jwts.parser().setSigningKey(getSigningKey()).build()
+        val claimsJws: Jws<Claims> = Jwts.parser()
+            .setSigningKey(getSigningKey())
+            .build()
             .parseClaimsJws(token)
 
         return getAuthenticationByClaims(claimsJws.payload)
@@ -67,13 +68,29 @@ class JwtTokenValidator(
 
     fun getAuthenticationByClaims(claims: Claims): Mono<Authentication> {
         // Claims에서 loginId와 memberId를 추출하고, 없으면 예외 발생
-        val loginId = claims["loginId"] ?: throw CustomException(ErrorException.EMAIL_NOT_FOUND)
+        //val loginId = claims["loginId"] ?: throw CustomException(ErrorException.EMAIL_NOT_FOUND)
         val memberId = claims["memberId"] ?: throw CustomException(ErrorException.MEMBER_ID_NOT_FOUND)
+        /*return customReactiveUserDetailsService.findByUsername(loginId as String)
+            .map { userDetails ->
+                UsernamePasswordAuthenticationToken(userDetails, userDetails.password, userDetails.authorities)
+            }*/
 
-        return customReactiveUserDetailsService.findByUsername(loginId as String)
+        return customReactiveUserDetailsService.findByMemberId(memberId.toString().toLong()) // ✅ memberId 기반 조회
             .map { userDetails ->
                 UsernamePasswordAuthenticationToken(userDetails, userDetails.password, userDetails.authorities)
             }
+    }
+
+    fun extractMemberIdFromToken(token: String): Long {
+        val key = getSigningKey()
+
+        val claims: Claims = Jwts.parser()
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(token)
+            .payload
+
+        return claims["memberId"].toString().toLong()
     }
 
 }

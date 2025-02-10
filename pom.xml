@@ -56,6 +56,14 @@
 			<version>0.8.2.RELEASE</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/io.r2dbc/r2dbc-pool -->
+		<dependency>
+			<groupId>io.r2dbc</groupId>
+			<artifactId>r2dbc-pool</artifactId>
+			<version>1.0.2.RELEASE</version>
+		</dependency>
+
+
 		<!-- Spring Boot Starter OAuth2 Client -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -154,6 +162,8 @@
 			<artifactId>java-dotenv</artifactId>
 			<version>5.2.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
+
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>

@@ -27,4 +27,13 @@ class CustomReactiveUserDetailsService(
             }
     }
 
+    fun findByMemberId(memberId: Long): Mono<CustomUserDetails> {
+        return memberRepository.findByMemberId(memberId)
+            .switchIfEmpty(Mono.error(CustomException(ErrorException.MEMBER_ID_NOT_FOUND))) // memberId가 없으면 예외 처리
+            .map { memberEntity ->
+                val authorities = listOf(SimpleGrantedAuthority("ROLE_USER"))
+                CustomUserDetails(memberEntity, authorities)
+            }
+    }
+
 }

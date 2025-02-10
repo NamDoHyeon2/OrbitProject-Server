@@ -51,7 +51,7 @@ class JwtTokenProvider {
     // 정보 관리 부분
     private fun createClaims(member: MemberEntity): Map<String, Any> {
         val claims = mutableMapOf<String, Any>()
-        claims["loginId"] = member.email
+        //claims["loginId"] = member.email
         claims["memberId"] = member.memberId!!
         //TODO Group 정보 추가
 

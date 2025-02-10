@@ -1,4 +1,4 @@
-CREATE TABLE `orbit`.`Group` (
+    CREATE TABLE `orbit`.`group` (
                                  `group_id` INT NOT NULL AUTO_INCREMENT,
                                  `group_name` VARCHAR(30) NOT NULL,
                                  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -6,9 +6,9 @@ CREATE TABLE `orbit`.`Group` (
                                  PRIMARY KEY (`group_id`)
 );
 
-INSERT INTO `Group` (group_name) VALUES ('test_group');
+INSERT INTO `orbit`.`group` (group_name) VALUES ('test_group');
 
-CREATE TABLE `orbit`.`Role` (
+CREATE TABLE `orbit`.`role` (
                                 `role_id` INT NOT NULL AUTO_INCREMENT,
                                 `role_name` VARCHAR(10) NOT NULL,
                                 `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -16,9 +16,9 @@ CREATE TABLE `orbit`.`Role` (
                                 PRIMARY KEY (`role_id`)
 );
 
-INSERT INTO `Role` (role_name) VALUES ('test_role');
+INSERT INTO `orbit`.`role` (role_name) VALUES ('test_role');
 
-CREATE TABLE `orbit`.`Member` (
+CREATE TABLE `orbit`.`member` (
                                   `member_id` INT NOT NULL AUTO_INCREMENT,
                                   `group_id` INT NOT NULL,
                                   `role_id` INT NOT NULL,
@@ -33,7 +33,22 @@ CREATE TABLE `orbit`.`Member` (
                                   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                   `last_login` DATETIME DEFAULT NULL,
-                                  PRIMARY KEY (`Member_id`),
-                                  CONSTRAINT `fk_group` FOREIGN KEY (`group_id`) REFERENCES `Group`(`group_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-                                  CONSTRAINT `fk_role` FOREIGN KEY (`role_id`) REFERENCES `Role`(`role_id`) ON DELETE CASCADE ON UPDATE CASCADE
+                                  PRIMARY KEY (`member_id`),
+                                  CONSTRAINT `fk_group` FOREIGN KEY (`group_id`) REFERENCES `group`(`group_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                                  CONSTRAINT `fk_role` FOREIGN KEY (`role_id`) REFERENCES `role`(`role_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+    CREATE TABLE `orbit`.`todo` (
+                                    `todo_id` INT NOT NULL AUTO_INCREMENT,
+                                    `maintask` VARCHAR(30) NOT NULL,
+                                    `task` VARCHAR(30) NOT NULL,
+                                    `detail` VARCHAR(200) NOT NULL,
+                                    `tags` VARCHAR(50) NOT NULL,
+                                    `is_check` TINYINT NOT NULL DEFAULT 0,
+                                    `date` DATETIME NOT NULL,
+                                    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                    `created_by` INT NOT NULL,
+                                    PRIMARY KEY (`todo_id`),
+                                    CONSTRAINT `fk_created_by` FOREIGN KEY (`created_by`) REFERENCES `member`(`member_id`) ON DELETE CASCADE ON UPDATE CASCADE
+    );

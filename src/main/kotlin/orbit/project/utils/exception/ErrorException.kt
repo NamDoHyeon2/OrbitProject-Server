@@ -16,5 +16,7 @@ enum class ErrorException(val message: String, val statusCode: Int) {
     MEMBER_ID_NOT_FOUND("멤버 아이디가 토큰에 존재하지 않습니다.", 400), // 멤버 아이디가 없는 경우
     FILE_IMAGE_NOT_FOUND("해당 파일이 존재하지 않습니다.", 400), // 멤버 아이디가 없는 경우
     EMAIL_CODE_NOT_FOUND("코드를 입력해주세요.", 400),
+    NOT_DATA("데이터를 찾을 수 없습니다", 404),
     INVALID_REQUEST_TIME("요청 시간이 잘못되었습니다.", 400),
+    AUTH_REQUIRED("Authentication required", 401)
 }
